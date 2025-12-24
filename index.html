@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For My Wifey ❤️</title>
     
-    <!-- Google Fonts: Playfair Display (Elegant) & Dancing Script (Headers) & Lato (Clean Data) -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
     <style>
@@ -23,6 +23,7 @@
             color: white;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            touch-action: none; /* Disables browser scrolling */
         }
 
         /* Floating Hearts Background */
@@ -70,7 +71,7 @@
             transition: all 0.3s ease;
         }
 
-        /* --- SLIDE SYSTEM (New Smooth Logic) --- */
+        /* --- SLIDE SYSTEM --- */
         #slides-wrapper {
             position: relative;
             width: 100%;
@@ -78,7 +79,7 @@
         }
 
         .slide {
-            position: absolute; /* Key to smooth transitions */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -86,18 +87,16 @@
             display: flex;
             flex-direction: column;
             
-            /* Initial State (Hidden) */
+            /* Initial State */
             opacity: 0;
-            transform: scale(1.05) translateY(10px);
+            transform: scale(1.05) translateX(20px); /* Subtle slide effect */
             visibility: hidden;
-            
-            /* The Magic Transition */
-            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .slide.active {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: scale(1) translateX(0);
             visibility: visible;
             z-index: 2;
         }
@@ -127,7 +126,7 @@
             text-shadow: 0 0 15px rgba(255, 51, 102, 0.6);
         }
 
-        /* Complex Timer Styles */
+        /* Timer Styles */
         .timer-container {
             font-family: 'Lato', sans-serif;
             font-weight: 300;
@@ -168,7 +167,7 @@
         /* Photo Area */
         .photo-frame {
             width: 100%;
-            height: 55%; /* Fixed percentage of card */
+            height: 55%; 
             overflow: hidden;
             position: relative;
             mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
@@ -207,14 +206,6 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        .tap-instruction {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.3);
-            margin-top: auto;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         /* Final Slide Styling */
         .final-slide-center {
             display: flex;
@@ -251,24 +242,21 @@
 
     <div class="heart-bg" id="heart-bg"></div>
 
-    <div id="card-container" onclick="nextSlide()">
+    <div id="card-container">
         
-        <!-- START SCREEN -->
+        <!-- START SCREEN (Tap required for Audio) -->
         <div id="start-screen" onclick="startShow(event)">
             <h1>Hey Nanna ❤️</h1>
             
             <div class="timer-container" id="complex-timer">
-                <!-- Javascript will fill this -->
                 Calculating...
             </div>
 
             <div class="tap-to-start">Tap to Begin</div>
         </div>
 
-        <!-- SLIDES WRAPPER -->
-        <div id="slides-wrapper">
-            <!-- JS will inject slides here -->
-        </div>
+        <!-- SLIDES -->
+        <div id="slides-wrapper"></div>
 
     </div>
 
@@ -278,7 +266,7 @@
         // ============================================
         
         // Start Date: 28 Feb 2025
-        const startDate = new Date(2025, 1, 28); // Month is 0-indexed (Jan=0, Feb=1)
+        const startDate = new Date(2025, 1, 28); 
 
         const slides = [
             {
@@ -317,14 +305,18 @@
 
         let currentSlideIndex = -1;
         const slideWrapper = document.getElementById("slides-wrapper");
+        const container = document.getElementById("card-container");
         const audio = document.getElementById("bg-music");
 
-        // --- Complex Timer Logic ---
+        // --- Touch Variables ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // --- Timer Logic ---
         function updateTimer() {
             const now = new Date();
             const diff = now - startDate; 
 
-            // Basic math for total counts
             const totalSeconds = Math.floor(diff / 1000);
             const totalMinutes = Math.floor(totalSeconds / 60);
             const totalHours = Math.floor(totalMinutes / 60);
@@ -332,14 +324,12 @@
             const totalWeeks = Math.floor(totalDays / 7);
             const weekRemainderDays = totalDays % 7;
 
-            // Date math for Months/Days
             let years = now.getFullYear() - startDate.getFullYear();
             let months = now.getMonth() - startDate.getMonth();
             let days = now.getDate() - startDate.getDate();
 
             if (days < 0) {
                 months--;
-                // Get days in previous month
                 const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
                 days += prevMonth.getDate();
             }
@@ -347,10 +337,7 @@
                 years--;
                 months += 12;
             }
-            // Total months roughly for display
             const totalMonthsDisplay = (years * 12) + months;
-
-            // Formatting with commas
             const fmt = (n) => n.toLocaleString();
 
             const html = `
@@ -375,23 +362,24 @@
             slides.forEach((slide, index) => {
                 const slideDiv = document.createElement("div");
                 slideDiv.className = "slide";
+                slideDiv.id = `slide-${index}`;
                 
-                // Content
+                // No instructions here
                 slideDiv.innerHTML = `
                     <div class="photo-frame">
-                        <img src="${slide.img}" alt="Us">
+                        <img src="${slide.img}" alt="Memories">
                     </div>
                     <div class="text-area">
                         <div class="text-content">${slide.text}</div>
-                        <div class="tap-instruction">Tap to continue</div>
                     </div>
                 `;
                 slideWrapper.appendChild(slideDiv);
             });
 
-            // Final Slide (No Buttons, Just Text)
+            // Final Slide
             const finalSlide = document.createElement("div");
             finalSlide.className = "slide";
+            finalSlide.id = "slide-final";
             finalSlide.innerHTML = `
                 <div class="final-slide-center">
                     <div class="final-message">
@@ -403,49 +391,100 @@
             slideWrapper.appendChild(finalSlide);
         }
 
-        // --- Transition Logic ---
+        // --- Start Show ---
         function startShow(e) {
             e.stopPropagation();
             const startScreen = document.getElementById("start-screen");
             
-            // Fade out start screen
             startScreen.style.opacity = "0";
-            startScreen.style.pointerEvents = "none"; // prevent clicks during fade
+            startScreen.style.pointerEvents = "none";
             
             setTimeout(() => {
                 startScreen.style.display = "none";
                 nextSlide();
                 audio.volume = 0.5;
                 audio.play().catch(e => console.log("Audio needed user gesture"));
+                
+                // Enable Swipe Listeners ONLY after start
+                enableSwipe();
             }, 800);
         }
 
+        // --- Navigation Logic ---
         function nextSlide() {
             const allSlides = document.querySelectorAll(".slide");
             
-            // Increment
+            if (currentSlideIndex >= allSlides.length - 1) return; // Stop at end
+
             currentSlideIndex++;
 
-            // Validation
-            if (currentSlideIndex >= allSlides.length) return;
+            // Update Classes
+            allSlides.forEach((s, i) => {
+                if (i === currentSlideIndex) {
+                    s.classList.add("active");
+                } else {
+                    s.classList.remove("active");
+                }
+            });
 
-            // Remove active class from previous
-            if (currentSlideIndex > 0) {
-                allSlides[currentSlideIndex - 1].classList.remove("active");
-            }
-
-            // Add active class to current
-            allSlides[currentSlideIndex].classList.add("active");
-
-            // Special Effect for Last Slide
+            // Trigger Celebration on Last Slide
             if (currentSlideIndex === allSlides.length - 1) {
-                document.getElementById("card-container").onclick = null; // Stop clicks
                 triggerCelebration();
             }
         }
 
+        function prevSlide() {
+            const allSlides = document.querySelectorAll(".slide");
+            
+            if (currentSlideIndex <= 0) return; // Stop at start
+
+            currentSlideIndex--;
+
+            allSlides.forEach((s, i) => {
+                if (i === currentSlideIndex) {
+                    s.classList.add("active");
+                } else {
+                    s.classList.remove("active");
+                }
+            });
+        }
+
+        // --- Swipe Handling ---
+        function enableSwipe() {
+            container.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            container.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+            
+            // Mouse support for desktop testing
+            container.addEventListener('mousedown', e => {
+                touchStartX = e.screenX;
+            });
+            container.addEventListener('mouseup', e => {
+                touchEndX = e.screenX;
+                handleSwipe();
+            });
+        }
+
+        function handleSwipe() {
+            const threshold = 50; // Min distance for swipe
+            
+            if (touchEndX < touchStartX - threshold) {
+                // Swiped Left -> Next
+                nextSlide();
+            }
+            
+            if (touchEndX > touchStartX + threshold) {
+                // Swiped Right -> Previous
+                prevSlide();
+            }
+        }
+
         function triggerCelebration() {
-            // Intense heart explosion
             setInterval(createHeart, 100);
         }
 
@@ -460,7 +499,7 @@
             setTimeout(() => { heart.remove(); }, 5000);
         }
 
-        setInterval(createHeart, 400); // Background ambient hearts
+        setInterval(createHeart, 400); 
         initSlides();
 
     </script>
