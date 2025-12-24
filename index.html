@@ -23,7 +23,7 @@
             color: white;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            touch-action: none; /* Disables browser scrolling */
+            touch-action: none; 
         }
 
         /* Floating Hearts Background */
@@ -87,9 +87,8 @@
             display: flex;
             flex-direction: column;
             
-            /* Initial State */
             opacity: 0;
-            transform: scale(1.05) translateX(20px); /* Subtle slide effect */
+            transform: scale(1.05) translateX(30px); 
             visibility: hidden;
             transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -206,6 +205,18 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
+        /* SWIPE INSTRUCTION */
+        .swipe-instruction {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: auto;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         /* Final Slide Styling */
         .final-slide-center {
             display: flex;
@@ -224,6 +235,7 @@
             color: #fff;
             line-height: 1.6;
             text-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+            margin-bottom: 40px;
         }
 
         @keyframes pulse {
@@ -270,7 +282,7 @@
 
         const slides = [
             {
-                img: "https://images.unsplash.com/photo-1543258103-a62bdc069871?q=80&w=1000&auto=format&fit=crop", 
+                img: "christmas.jpeg", 
                 text: "<b>Hey Nanna 💞</b><br>Merry Christmas 🎄<br>I wanted to tell you something..."
             },
             {
@@ -308,7 +320,7 @@
         const container = document.getElementById("card-container");
         const audio = document.getElementById("bg-music");
 
-        // --- Touch Variables ---
+        // Touch Variables
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -364,13 +376,14 @@
                 slideDiv.className = "slide";
                 slideDiv.id = `slide-${index}`;
                 
-                // No instructions here
+                // Content with UPDATED Arrow (Right pointing for Next)
                 slideDiv.innerHTML = `
                     <div class="photo-frame">
                         <img src="${slide.img}" alt="Memories">
                     </div>
                     <div class="text-area">
                         <div class="text-content">${slide.text}</div>
+                        <div class="swipe-instruction">Swipe for Next &rarr;</div>
                     </div>
                 `;
                 slideWrapper.appendChild(slideDiv);
@@ -386,6 +399,8 @@
                         "I really hope we make it till the end, and make it official with our parents' blessing."
                         <br><br>❤️
                     </div>
+                    <!-- ADDED PREV INSTRUCTION -->
+                    <div class="swipe-instruction">Swipe &larr; for Prev</div>
                 </div>
             `;
             slideWrapper.appendChild(finalSlide);
@@ -405,7 +420,7 @@
                 audio.volume = 0.5;
                 audio.play().catch(e => console.log("Audio needed user gesture"));
                 
-                // Enable Swipe Listeners ONLY after start
+                // Enable Swipe Listeners
                 enableSwipe();
             }, 800);
         }
@@ -460,7 +475,7 @@
                 handleSwipe();
             }, {passive: true});
             
-            // Mouse support for desktop testing
+            // Mouse support
             container.addEventListener('mousedown', e => {
                 touchStartX = e.screenX;
             });
@@ -471,15 +486,15 @@
         }
 
         function handleSwipe() {
-            const threshold = 50; // Min distance for swipe
+            const threshold = 50; 
             
+            // Swipe Left (Go Next)
             if (touchEndX < touchStartX - threshold) {
-                // Swiped Left -> Next
                 nextSlide();
             }
             
+            // Swipe Right (Go Prev)
             if (touchEndX > touchStartX + threshold) {
-                // Swiped Right -> Previous
                 prevSlide();
             }
         }
@@ -491,7 +506,7 @@
         function createHeart() {
             const heart = document.createElement("div");
             heart.className = "heart-particle";
-            heart.innerHTML = ["❤️", "💖", "✨", "🌸", "💑"][Math.floor(Math.random() * 5)];
+            heart.innerHTML = ["❤️", "💖", "✨", "🌸", "💑", "🥂", "💫", "🎊"][Math.floor(Math.random() * 8)];
             heart.style.left = Math.random() * 100 + "vw";
             heart.style.fontSize = (Math.random() * 20 + 15) + "px";
             heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
