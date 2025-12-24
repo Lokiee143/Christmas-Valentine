@@ -34,7 +34,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 0;
+            z-index: 0; /* Behind card */
             overflow: hidden;
         }
 
@@ -45,6 +45,34 @@
             font-size: 20px;
             animation: floatUp linear infinite;
             opacity: 0;
+        }
+
+        /* --- SNOWFLAKES (New Christmas Addition) --- */
+        .snow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20; /* In front of card for depth */
+            overflow: hidden;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            filter: blur(1px); /* Softens the snow */
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0px); opacity: 1; }
+            100% { transform: translateY(110vh) translateX(20px); opacity: 0.3; }
         }
 
         @keyframes floatUp {
@@ -200,21 +228,34 @@
         .text-content {
             font-size: 19px;
             line-height: 1.6;
-            margin-bottom: 10px;
             color: #f0f0f0;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* BREATHING HEART */
+        .spacer-heart {
+            font-size: 60px;
+            margin-top: auto;
+            margin-bottom: auto;
+            animation: breathe 2.5s ease-in-out infinite;
+            text-shadow: 0 0 15px rgba(255, 77, 109, 0.6);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; text-shadow: 0 0 15px rgba(255, 77, 109, 0.6); }
+            50% { transform: scale(1.15); opacity: 1; text-shadow: 0 0 25px rgba(255, 77, 109, 1); }
         }
 
         /* SWIPE INSTRUCTION */
         .swipe-instruction {
             font-size: 10px;
             color: rgba(255, 255, 255, 0.3);
-            margin-top: auto;
             text-transform: uppercase;
             letter-spacing: 2px;
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-top: 10px; 
         }
 
         /* Final Slide Styling */
@@ -235,7 +276,7 @@
             color: #fff;
             line-height: 1.6;
             text-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         @keyframes pulse {
@@ -253,6 +294,7 @@
     </audio>
 
     <div class="heart-bg" id="heart-bg"></div>
+    <div class="snow-container" id="snow-container"></div>
 
     <div id="card-container">
         
@@ -371,18 +413,22 @@
 
         // --- Init Slides ---
         function initSlides() {
+            const hearts = ["💗", "💖", "💞", "💘", "💝", "❤️", "💌", "💓"];
+
             slides.forEach((slide, index) => {
                 const slideDiv = document.createElement("div");
                 slideDiv.className = "slide";
                 slideDiv.id = `slide-${index}`;
                 
-                // Content with UPDATED Arrow (Right pointing for Next)
+                const randomHeart = hearts[Math.floor(Math.random() * hearts.length)];
+
                 slideDiv.innerHTML = `
                     <div class="photo-frame">
                         <img src="${slide.img}" alt="Memories">
                     </div>
                     <div class="text-area">
                         <div class="text-content">${slide.text}</div>
+                        <div class="spacer-heart">${randomHeart}</div>
                         <div class="swipe-instruction">Swipe for Next &rarr;</div>
                     </div>
                 `;
@@ -393,14 +439,17 @@
             const finalSlide = document.createElement("div");
             finalSlide.className = "slide";
             finalSlide.id = "slide-final";
+            
+            const finalHeart = hearts[Math.floor(Math.random() * hearts.length)];
+
             finalSlide.innerHTML = `
                 <div class="final-slide-center">
                     <div class="final-message">
                         "I really hope we make it till the end, and make it official with our parents' blessing."
                         <br><br>❤️
                     </div>
-                    <!-- ADDED PREV INSTRUCTION -->
-                    <div class="swipe-instruction">Swipe &larr; for Prev</div>
+                    <div class="spacer-heart">${finalHeart}</div>
+                    <div class="swipe-instruction">&larr; Swipe for Prev</div>
                 </div>
             `;
             slideWrapper.appendChild(finalSlide);
@@ -419,8 +468,6 @@
                 nextSlide();
                 audio.volume = 0.5;
                 audio.play().catch(e => console.log("Audio needed user gesture"));
-                
-                // Enable Swipe Listeners
                 enableSwipe();
             }, 800);
         }
@@ -428,21 +475,9 @@
         // --- Navigation Logic ---
         function nextSlide() {
             const allSlides = document.querySelectorAll(".slide");
-            
-            if (currentSlideIndex >= allSlides.length - 1) return; // Stop at end
-
+            if (currentSlideIndex >= allSlides.length - 1) return; 
             currentSlideIndex++;
-
-            // Update Classes
-            allSlides.forEach((s, i) => {
-                if (i === currentSlideIndex) {
-                    s.classList.add("active");
-                } else {
-                    s.classList.remove("active");
-                }
-            });
-
-            // Trigger Celebration on Last Slide
+            updateActiveSlide();
             if (currentSlideIndex === allSlides.length - 1) {
                 triggerCelebration();
             }
@@ -450,11 +485,13 @@
 
         function prevSlide() {
             const allSlides = document.querySelectorAll(".slide");
-            
-            if (currentSlideIndex <= 0) return; // Stop at start
-
+            if (currentSlideIndex <= 0) return; 
             currentSlideIndex--;
+            updateActiveSlide();
+        }
 
+        function updateActiveSlide() {
+            const allSlides = document.querySelectorAll(".slide");
             allSlides.forEach((s, i) => {
                 if (i === currentSlideIndex) {
                     s.classList.add("active");
@@ -475,7 +512,6 @@
                 handleSwipe();
             }, {passive: true});
             
-            // Mouse support
             container.addEventListener('mousedown', e => {
                 touchStartX = e.screenX;
             });
@@ -487,13 +523,9 @@
 
         function handleSwipe() {
             const threshold = 50; 
-            
-            // Swipe Left (Go Next)
             if (touchEndX < touchStartX - threshold) {
                 nextSlide();
             }
-            
-            // Swipe Right (Go Prev)
             if (touchEndX > touchStartX + threshold) {
                 prevSlide();
             }
@@ -503,10 +535,11 @@
             setInterval(createHeart, 100);
         }
 
+        // --- PARTICLE EFFECTS (Hearts & Snow) ---
         function createHeart() {
             const heart = document.createElement("div");
             heart.className = "heart-particle";
-            heart.innerHTML = ["❤️", "💖", "✨", "🌸", "💑", "🥂", "💫", "🎊"][Math.floor(Math.random() * 8)];
+            heart.innerHTML = ["❤️", "💖", "✨", "🌸", "💑"][Math.floor(Math.random() * 5)];
             heart.style.left = Math.random() * 100 + "vw";
             heart.style.fontSize = (Math.random() * 20 + 15) + "px";
             heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
@@ -514,7 +547,23 @@
             setTimeout(() => { heart.remove(); }, 5000);
         }
 
+        function createSnow() {
+            const snow = document.createElement('div');
+            snow.classList.add('snowflake');
+            snow.style.left = Math.random() * 100 + 'vw';
+            snow.style.animationDuration = Math.random() * 3 + 2 + 's'; // Falling speed
+            snow.style.opacity = Math.random();
+            snow.style.width = snow.style.height = Math.random() * 5 + 2 + 'px'; // Size variation
+            
+            document.getElementById('snow-container').appendChild(snow);
+            
+            setTimeout(() => { snow.remove(); }, 5000);
+        }
+
+        // Run animations
         setInterval(createHeart, 400); 
+        setInterval(createSnow, 50); // High frequency for nice snowfall
+
         initSlides();
 
     </script>
