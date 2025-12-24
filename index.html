@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For My Wifey ❤️</title>
+    
+    <!-- Google Fonts: Playfair Display (Elegant) & Dancing Script (Headers) & Lato (Clean Data) -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lato:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS STYLES --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: 'Playfair Display', serif; 
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh; 
+            color: white;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Floating Hearts Background */
+        .heart-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .heart-particle {
+            position: absolute;
+            bottom: -20px;
+            color: #ff4d6d;
+            font-size: 20px;
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+        }
+
+        /* --- CARD CONTAINER --- */
+        #card-container {
+            width: 90%;
+            max-width: 420px;
+            height: 75vh;
+            max-height: 750px;
+            background: rgba(18, 18, 18, 0.85); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* --- SLIDE SYSTEM (New Smooth Logic) --- */
+        #slides-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            position: absolute; /* Key to smooth transitions */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            /* Initial State (Hidden) */
+            opacity: 0;
+            transform: scale(1.05) translateY(10px);
+            visibility: hidden;
+            
+            /* The Magic Transition */
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            visibility: visible;
+            z-index: 2;
+        }
+
+        /* Start Screen */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            cursor: pointer;
+            transition: opacity 0.8s ease;
+        }
+
+        #start-screen h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 42px;
+            color: #ff3366;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.6);
+        }
+
+        /* Complex Timer Styles */
+        .timer-container {
+            font-family: 'Lato', sans-serif;
+            font-weight: 300;
+            text-align: left;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 2px solid #ff3366;
+        }
+
+        .timer-line {
+            font-size: 14px;
+            margin: 4px 0;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+        }
+        
+        .timer-line span {
+            color: #ff3366;
+            font-weight: bold;
+            margin-right: 6px;
+            min-width: 20px;
+            text-align: right;
+        }
+
+        .tap-to-start {
+            font-size: 14px;
+            animation: pulse 1.5s infinite;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Photo Area */
+        .photo-frame {
+            width: 100%;
+            height: 55%; /* Fixed percentage of card */
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            animation: kenBurns 15s infinite alternate;
+        }
+
+        @keyframes kenBurns {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+
+        /* Text Area */
+        .text-area {
+            height: 45%;
+            padding: 0 30px 20px 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .text-content {
+            font-size: 19px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: #f0f0f0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .tap-instruction {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: auto;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Final Slide Styling */
+        .final-slide-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 30px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255,51,102,0.1) 0%, transparent 70%);
+        }
+
+        .final-message {
+            font-family: 'Dancing Script', cursive;
+            font-size: 32px;
+            color: #fff;
+            line-height: 1.6;
+            text-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="aud.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="heart-bg" id="heart-bg"></div>
+
+    <div id="card-container" onclick="nextSlide()">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" onclick="startShow(event)">
+            <h1>Hey Nanna ❤️</h1>
+            
+            <div class="timer-container" id="complex-timer">
+                <!-- Javascript will fill this -->
+                Calculating...
+            </div>
+
+            <div class="tap-to-start">Tap to Begin</div>
+        </div>
+
+        <!-- SLIDES WRAPPER -->
+        <div id="slides-wrapper">
+            <!-- JS will inject slides here -->
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================
+        // 1. DATA SECTION
+        // ============================================
+        
+        // Start Date: 28 Feb 2025
+        const startDate = new Date(2025, 1, 28); // Month is 0-indexed (Jan=0, Feb=1)
+
+        const slides = [
+            {
+                img: "https://images.unsplash.com/photo-1543258103-a62bdc069871?q=80&w=1000&auto=format&fit=crop", 
+                text: "<b>Hey Nanna 💞</b><br>Merry Christmas 🎄<br>I wanted to tell you something..."
+            },
+            {
+                img: "sceneray.jpeg", 
+                text: "I sat down to write this because I wanted to say something I don't say often enough. I've been thinking about our journey..."
+            },
+            {
+                img: "ghibli.jpeg", 
+                text: "The hurdles we've faced and the times things felt truly impossible. I admit, there were times I lost hope."
+            },
+            {
+                img: "laughing.jpeg", 
+                text: "But every single time, <b>you</b> were the one who stayed strong. You breathed life into our relationship when I thought it was gone."
+            },
+            {
+                img: "kissing.jpeg", 
+                text: "Your strength is the reason I’m still standing here today. Thank you for not giving up on me."
+            },
+            {
+                img: "night.jpeg", 
+                text: "From now on, I want to be the one standing firm beside you, holding that hope so you don't have to carry it all alone."
+            },
+            {
+                img: "rings.jpeg", 
+                text: "I love you more than words can say.<br>Always yours,<br>- Nanna"
+            }
+        ];
+
+        // ============================================
+        // 2. LOGIC
+        // ============================================
+
+        let currentSlideIndex = -1;
+        const slideWrapper = document.getElementById("slides-wrapper");
+        const audio = document.getElementById("bg-music");
+
+        // --- Complex Timer Logic ---
+        function updateTimer() {
+            const now = new Date();
+            const diff = now - startDate; 
+
+            // Basic math for total counts
+            const totalSeconds = Math.floor(diff / 1000);
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const totalHours = Math.floor(totalMinutes / 60);
+            const totalDays = Math.floor(totalHours / 24);
+            const totalWeeks = Math.floor(totalDays / 7);
+            const weekRemainderDays = totalDays % 7;
+
+            // Date math for Months/Days
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+
+            if (days < 0) {
+                months--;
+                // Get days in previous month
+                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            // Total months roughly for display
+            const totalMonthsDisplay = (years * 12) + months;
+
+            // Formatting with commas
+            const fmt = (n) => n.toLocaleString();
+
+            const html = `
+                <div style="font-size:12px; margin-bottom:5px; color:#aaa;">Together for:</div>
+                <div class="timer-line"><span>${totalMonthsDisplay}</span> Months ${days} Days</div>
+                <div class="timer-line" style="font-size:12px; color:#666; margin:2px 0;">— OR —</div>
+                <div class="timer-line"><span>${totalWeeks}</span> Weeks ${weekRemainderDays} Days</div>
+                <div class="timer-line" style="font-size:12px; color:#666; margin:2px 0;">— OR —</div>
+                <div class="timer-line"><span>${fmt(totalDays)}</span> Days</div>
+                <div class="timer-line"><span>${fmt(totalHours)}</span> Hours</div>
+                <div class="timer-line"><span>${fmt(totalMinutes)}</span> Minutes</div>
+                <div class="timer-line"><span>${fmt(totalSeconds)}</span> Seconds</div>
+            `;
+
+            document.getElementById("complex-timer").innerHTML = html;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // --- Init Slides ---
+        function initSlides() {
+            slides.forEach((slide, index) => {
+                const slideDiv = document.createElement("div");
+                slideDiv.className = "slide";
+                
+                // Content
+                slideDiv.innerHTML = `
+                    <div class="photo-frame">
+                        <img src="${slide.img}" alt="Us">
+                    </div>
+                    <div class="text-area">
+                        <div class="text-content">${slide.text}</div>
+                        <div class="tap-instruction">Tap to continue</div>
+                    </div>
+                `;
+                slideWrapper.appendChild(slideDiv);
+            });
+
+            // Final Slide (No Buttons, Just Text)
+            const finalSlide = document.createElement("div");
+            finalSlide.className = "slide";
+            finalSlide.innerHTML = `
+                <div class="final-slide-center">
+                    <div class="final-message">
+                        "I really hope we make it till the end, and make it official with our parents' blessing."
+                        <br><br>❤️
+                    </div>
+                </div>
+            `;
+            slideWrapper.appendChild(finalSlide);
+        }
+
+        // --- Transition Logic ---
+        function startShow(e) {
+            e.stopPropagation();
+            const startScreen = document.getElementById("start-screen");
+            
+            // Fade out start screen
+            startScreen.style.opacity = "0";
+            startScreen.style.pointerEvents = "none"; // prevent clicks during fade
+            
+            setTimeout(() => {
+                startScreen.style.display = "none";
+                nextSlide();
+                audio.volume = 0.5;
+                audio.play().catch(e => console.log("Audio needed user gesture"));
+            }, 800);
+        }
+
+        function nextSlide() {
+            const allSlides = document.querySelectorAll(".slide");
+            
+            // Increment
+            currentSlideIndex++;
+
+            // Validation
+            if (currentSlideIndex >= allSlides.length) return;
+
+            // Remove active class from previous
+            if (currentSlideIndex > 0) {
+                allSlides[currentSlideIndex - 1].classList.remove("active");
+            }
+
+            // Add active class to current
+            allSlides[currentSlideIndex].classList.add("active");
+
+            // Special Effect for Last Slide
+            if (currentSlideIndex === allSlides.length - 1) {
+                document.getElementById("card-container").onclick = null; // Stop clicks
+                triggerCelebration();
+            }
+        }
+
+        function triggerCelebration() {
+            // Intense heart explosion
+            setInterval(createHeart, 100);
+        }
+
+        function createHeart() {
+            const heart = document.createElement("div");
+            heart.className = "heart-particle";
+            heart.innerHTML = ["❤️", "💖", "✨", "🌸", "💑"][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            document.getElementById("heart-bg").appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 5000);
+        }
+
+        setInterval(createHeart, 400); // Background ambient hearts
+        initSlides();
+
+    </script>
+</body>
+</html>
