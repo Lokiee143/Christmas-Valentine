@@ -238,7 +238,6 @@
             font-size: 60px;
             margin-top: auto;
             margin-bottom: auto;
-            /* Drop shadow filter works best for emojis on mobile */
             filter: drop-shadow(0 0 10px rgba(255, 20, 147, 0.8));
             animation: breathe 2.5s ease-in-out infinite;
             will-change: transform, filter; 
@@ -325,7 +324,22 @@
 
     <script>
         // ============================================
-        // 1. DATA SECTION
+        // 1. CONFIGURATION (CONTROL SNOW HERE!)
+        // ============================================
+        
+        // SPEED: Higher number = Slower fall (More cinematic)
+        const snowSpeed = 15; // 15 means it takes 15-25 seconds to fall
+
+        // AMOUNT: Higher number = LESS snow (More delay between flakes)
+        // 500 = 2 flakes per second. 1000 = 1 flake per second.
+        const snowAmount = 600; 
+
+        // SIZE: Range in pixels (Min, Max)
+        const snowSizeMin = 6;
+        const snowSizeMax = 10;
+
+        // ============================================
+        // 2. DATA SECTION
         // ============================================
         
         // Start Date: 28 Feb 2025
@@ -363,7 +377,7 @@
         ];
 
         // ============================================
-        // 2. LOGIC
+        // 3. LOGIC
         // ============================================
 
         let currentSlideIndex = -1;
@@ -371,9 +385,9 @@
         const container = document.getElementById("card-container");
         const audio = document.getElementById("bg-music");
 
-        // Touch Variables
         let touchStartX = 0;
         let touchEndX = 0;
+        const isMobile = window.innerWidth < 768;
 
         // --- Timer Logic ---
         function updateTimer() {
@@ -468,10 +482,8 @@
         function startShow(e) {
             e.stopPropagation();
             const startScreen = document.getElementById("start-screen");
-            
             startScreen.style.opacity = "0";
             startScreen.style.pointerEvents = "none";
-            
             setTimeout(() => {
                 startScreen.style.display = "none";
                 nextSlide();
@@ -541,21 +553,19 @@
         }
 
         function triggerCelebration() {
-            // Slower celebration hearts too
-            setInterval(createHeart, 200);
+            setInterval(createHeart, 100);
         }
 
-        // --- SLOW MOTION PARTICLE EFFECTS ---
+        // --- PARTICLE EFFECTS ---
         function createHeart() {
             const heart = document.createElement("div");
             heart.className = "heart-particle";
             heart.innerHTML = ["❤️", "💖", "✨", "🌸", "💑"][Math.floor(Math.random() * 5)];
             heart.style.left = Math.random() * 100 + "vw";
             heart.style.fontSize = (Math.random() * 20 + 15) + "px";
-            // Slow motion hearts (10-15s float up)
-            heart.style.animationDuration = (Math.random() * 5 + 10) + "s";
+            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
             document.getElementById("heart-bg").appendChild(heart);
-            setTimeout(() => { heart.remove(); }, 15000);
+            setTimeout(() => { heart.remove(); }, 5000);
         }
 
         function createSnow() {
@@ -563,24 +573,29 @@
             snow.classList.add('snowflake');
             snow.style.left = Math.random() * 100 + 'vw';
             
-            // --- SLOW MOTION SNOW ---
-            // 10 to 20 seconds to fall (Movie feel)
-            snow.style.animationDuration = Math.random() * 10 + 10 + 's'; 
+            // Speed logic using the Config variable
+            // e.g. 15s + random(0-10)s
+            const duration = snowSpeed + Math.random() * 10;
             
+            snow.style.animationDuration = duration + 's';
             snow.style.opacity = Math.random();
             
-            // Big fluffy snow (4px to 12px)
-            snow.style.width = snow.style.height = Math.random() * 8 + 4 + 'px';
+            // Size logic using Config variable
+            snow.style.width = snow.style.height = (Math.random() * (snowSizeMax - snowSizeMin) + snowSizeMin) + 'px';
             
             document.getElementById('snow-container').appendChild(snow);
             
-            // Must allow enough time for them to fall before deleting!
-            setTimeout(() => { snow.remove(); }, 20000);
+            // Remove after it falls
+            setTimeout(() => { snow.remove(); }, duration * 1000);
         }
 
         // Run animations
-        setInterval(createHeart, 600); // Slower generation rate for calm feel
-        setInterval(createSnow, 200);  // Slower generation rate for fewer flakes
+        const heartRate = isMobile ? 800 : 400;
+        setInterval(createHeart, heartRate); 
+
+        // Apply User Config for Snow
+        const finalSnowAmount = isMobile ? (snowAmount * 2) : snowAmount; // Even less snow on mobile to be safe
+        setInterval(createSnow, finalSnowAmount);
 
         initSlides();
 
